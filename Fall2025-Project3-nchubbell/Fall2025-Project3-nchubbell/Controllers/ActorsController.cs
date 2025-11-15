@@ -1,0 +1,250 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Fall2025_Project3_nchubbell.Data;
+using Fall2025_Project3_nchubbell.Models;
+using Fall2025_Project3_nchubbell.Models.ViewModels;
+using Fall2025_Project3_nchubbell.Services;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using VaderSharp2;
+
+namespace Fall2025_Project3_nchubbell.Controllers
+{
+    public class ActorsController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IAIReviewService _aiReviewService;
+
+        public ActorsController(ApplicationDbContext context, IAIReviewService aiReviewService)
+        {
+            _context = context;
+            _aiReviewService = aiReviewService;
+        }
+
+        // GET: Actors
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.Actors.ToListAsync());
+        }
+
+        // GET: Actors/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var actor = await _context.Actors
+                .Include(a => a.ActorMovies)
+                    .ThenInclude(am => am.Movie)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (actor == null)
+            {
+                return NotFound();
+            }
+
+            // 1. Get AI-generated tweets as one big string
+            var aiTweetsRaw = await _aiReviewService.GenerateActorTweetsAsync(
+                actor.Name,
+                tweetCount: 20);
+
+            // 2. Split into individual tweets/comments (blank line separation)
+            var aiTweets = aiTweetsRaw
+                .Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            // 3. Analyze sentiment with VADER
+            var analyzer = new SentimentIntensityAnalyzer();
+            var tweetViewModels = new List<ReviewWithSentiment>();
+
+            foreach (var text in aiTweets)
+            {
+                var scores = analyzer.PolarityScores(text);
+
+                string label;
+                if (scores.Compound >= 0.05)
+                {
+                    label = "Positive";
+                }
+                else if (scores.Compound <= -0.05)
+                {
+                    label = "Negative";
+                }
+                else
+                {
+                    label = "Neutral";
+                }
+
+                tweetViewModels.Add(new ReviewWithSentiment
+                {
+                    Text = text,
+                    Compound = scores.Compound,
+                    Positive = scores.Positive,
+                    Negative = scores.Negative,
+                    Neutral = scores.Neutral,
+                    Label = label
+                });
+            }
+
+            // 4. Compute overall sentiment
+            double overallCompound = tweetViewModels.Any()
+                ? tweetViewModels.Average(t => t.Compound)
+                : 0.0;
+
+            string overallLabel;
+            if (overallCompound >= 0.05)
+            {
+                overallLabel = "Overall Positive";
+            }
+            else if (overallCompound <= -0.05)
+            {
+                overallLabel = "Overall Negative";
+            }
+            else
+            {
+                overallLabel = "Overall Neutral";
+            }
+
+            // 5. Build the view model
+            var viewModel = new ActorDetailsViewModel
+            {
+                Id = actor.Id,
+                Name = actor.Name,
+                Gender = actor.Gender,
+                Age = actor.Age,
+                ImdbUrl = actor.ImdbUrl,
+                Photo = actor.Photo,
+                Movies = actor.ActorMovies
+                    .Select(am => am.Movie)
+                    .Where(m => m != null)
+                    .ToList(),
+                Tweets = tweetViewModels,
+                OverallCompoundSentiment = overallCompound,
+                OverallSentimentLabel = overallLabel
+            };
+
+            return View(viewModel);
+        }
+
+        // GET: Actors/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Actors/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Actor actor, IFormFile photoFile)
+        {
+            if (photoFile != null && photoFile.Length > 0)
+            {
+                using var ms = new MemoryStream();
+                await photoFile.CopyToAsync(ms);
+                actor.Photo = ms.ToArray();
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(actor);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(actor);
+        }
+
+        // GET: Actors/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var actor = await _context.Actors.FindAsync(id);
+            if (actor == null)
+            {
+                return NotFound();
+            }
+            return View(actor);
+        }
+
+        // POST: Actors/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Gender,Age,ImdbUrl,Photo")] Actor actor)
+        {
+            if (id != actor.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(actor);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ActorExists(actor.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(actor);
+        }
+
+        // GET: Actors/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var actor = await _context.Actors
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (actor == null)
+            {
+                return NotFound();
+            }
+
+            return View(actor);
+        }
+
+        // POST: Actors/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var actor = await _context.Actors.FindAsync(id);
+            if (actor != null)
+            {
+                _context.Actors.Remove(actor);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool ActorExists(int id)
+        {
+            return _context.Actors.Any(e => e.Id == id);
+        }
+    }
+}

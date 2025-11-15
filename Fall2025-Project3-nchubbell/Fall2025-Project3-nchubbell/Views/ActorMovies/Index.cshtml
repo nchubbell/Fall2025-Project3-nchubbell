@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Fall2025_Project3_nchubbell.Models.ActorMovie>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Actor</th>
+            <th>Movie</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Actor.Name)
+                </td>
+                <td>
+                    @* Use Title instead of Genre; change back if you prefer Genre *@
+                    @Html.DisplayFor(modelItem => item.Movie.Title)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { actorId = item.ActorId, movieId = item.MovieId }) |
+                    @Html.ActionLink("Edit", "Edit", new { actorId = item.ActorId, movieId = item.MovieId }) |
+                    @Html.ActionLink("Delete", "Delete", new { actorId = item.ActorId, movieId = item.MovieId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,148 @@
+﻿@model Fall2025_Project3_nchubbell.Models.ViewModels.ActorDetailsViewModel
+@using System
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>@Model.Name</h1>
+
+<div>
+    <h4>Actor</h4>
+    <hr />
+    <dl class="row">
+
+        <dt class="col-sm-2">
+            Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Name
+        </dd>
+
+        <dt class="col-sm-2">
+            Gender
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Gender
+        </dd>
+
+        <dt class="col-sm-2">
+            Age
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Age
+        </dd>
+
+        <dt class="col-sm-2">
+            IMDb
+        </dt>
+        <dd class="col-sm-10">
+            @if (!string.IsNullOrEmpty(Model.ImdbUrl))
+            {
+                <a href="@Model.ImdbUrl" target="_blank" rel="noopener noreferrer">
+                    @Model.ImdbUrl
+                </a>
+            }
+            else
+            {
+                <span>No IMDb link provided.</span>
+            }
+        </dd>
+
+        <dt class="col-sm-2">
+            Photo
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Photo != null)
+            {
+                var base64 = Convert.ToBase64String(Model.Photo);
+                var imgSrc = $"data:image/png;base64,{base64}";
+                <img src="@imgSrc" alt="Actor photo" class="img-fluid" />
+            }
+            else
+            {
+                <span>No photo available.</span>
+            }
+        </dd>
+
+    </dl>
+</div>
+
+<hr />
+
+<h4>Movies</h4>
+@if (Model.Movies != null && Model.Movies.Any())
+{
+    <ul>
+        @foreach (var movie in Model.Movies)
+        {
+            <li>
+                <a asp-controller="Movies"
+                   asp-action="Details"
+                   asp-route-id="@movie.Id">
+                    @movie.Title (@movie.Year)
+                </a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No movies linked to this actor.</p>
+}
+
+<hr />
+
+<h3>AI-Generated Tweets &amp; Sentiment</h3>
+
+@if (Model.Tweets != null && Model.Tweets.Any())
+{
+    <!-- Overall sentiment heading -->
+    <h5>
+        Overall Sentiment:
+        <strong>@Model.OverallSentimentLabel</strong>
+        (@Model.OverallCompoundSentiment.ToString("0.000"))
+    </h5>
+
+    <!-- Table with two columns: Tweet + Sentiment -->
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Tweet</th>
+                <th>Sentiment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tweet in Model.Tweets)
+            {
+                string sentimentClass =
+                    tweet.Label == "Positive" ? "text-success" :
+                    tweet.Label == "Negative" ? "text-danger" :
+                    "text-muted";
+
+                <tr>
+                    <td>
+                        @tweet.Text
+                    </td>
+                    <td class="@sentimentClass">
+                        <strong>@tweet.Label</strong>
+                        <span class="d-block">
+                            (compound: @tweet.Compound.ToString("0.000"))
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No AI tweets available.</p>
+}
+
+<hr />
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
