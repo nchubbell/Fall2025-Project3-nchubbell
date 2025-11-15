@@ -6,18 +6,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// -----------------------------
-// Dependency Injection
-// -----------------------------
 
-// AI Review Service
 builder.Services.AddScoped<IAIReviewService, AzureAIReviewService>();
 
-// (Optional) Azure OpenAI config
+
 var azureOpenAiSection = builder.Configuration.GetSection("AzureOpenAI");
 builder.Services.Configure<AzureOpenAISettings>(azureOpenAiSection);
 
-// Database
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -26,25 +22,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-// Identity
+
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
 })
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-// MVC / Razor
 builder.Services.AddControllersWithViews();
 
-// -----------------------------
-// Build App
-// -----------------------------
-
 var app = builder.Build();
-
-// -----------------------------
-// Middleware Pipeline
-// -----------------------------
 
 if (app.Environment.IsDevelopment())
 {
@@ -60,12 +47,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
-// -----------------------------
-// Routing
-// -----------------------------
 
 app.MapControllerRoute(
     name: "default",

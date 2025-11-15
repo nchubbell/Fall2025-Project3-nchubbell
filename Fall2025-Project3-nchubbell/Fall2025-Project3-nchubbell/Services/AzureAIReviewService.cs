@@ -21,7 +21,6 @@ namespace Fall2025_Project3_nchubbell.Services
             string deploymentName = configuration["AzureOpenAI:DeploymentName"]
                 ?? throw new InvalidOperationException("AzureOpenAI:DeploymentName not configured.");
 
-            // Azure.AI.OpenAI 2.x style
             var azureClient = new AzureOpenAIClient(
                 new Uri(endpoint),
                 new ApiKeyCredential(apiKey));
@@ -29,7 +28,6 @@ namespace Fall2025_Project3_nchubbell.Services
             _chatClient = azureClient.GetChatClient(deploymentName);
         }
 
-        // Generate N reviews for a movie (we'll call it with N = 3)
         public async Task<string> GenerateMovieReviewsAsync(string title, string? description, int reviewCount)
         {
             var systemMessage = new SystemChatMessage(
@@ -48,11 +46,9 @@ namespace Fall2025_Project3_nchubbell.Services
             ChatCompletion completion = await _chatClient.CompleteChatAsync(
                 new ChatMessage[] { systemMessage, userMessage });
 
-            // All reviews in one big string; controllers will split on blank lines
             return completion.Content[0].Text;
         }
 
-        // Generate N tweets/comments for an actor (we'll call it with N = 5)
         public async Task<string> GenerateActorTweetsAsync(string actorName, int tweetCount)
         {
             var systemMessage = new SystemChatMessage(

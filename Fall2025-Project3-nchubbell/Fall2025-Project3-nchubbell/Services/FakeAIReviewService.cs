@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 namespace Fall2025_Project3_nchubbell.Services
 {
-    // Simple fake implementation for testing without calling Azure
     public class FakeAIReviewService : IAIReviewService
     {
         public Task<string> GenerateMovieReviewsAsync(string title, string? description, int reviewCount)

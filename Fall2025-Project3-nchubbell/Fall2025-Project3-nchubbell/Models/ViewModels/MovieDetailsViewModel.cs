@@ -12,7 +12,6 @@ namespace Fall2025_Project3_nchubbell.Models.ViewModels
         public double Negative { get; set; }
         public double Neutral { get; set; }
 
-        // "Positive", "Neutral", or "Negative"
         public string Label { get; set; } = string.Empty;
     }
 
@@ -28,7 +27,6 @@ namespace Fall2025_Project3_nchubbell.Models.ViewModels
         public List<Actor> Actors { get; set; } = new();
         public List<ReviewWithSentiment> Reviews { get; set; } = new();
 
-        // NEW: overall sentiment heading fields
         public double OverallCompoundSentiment { get; set; }
         public string OverallSentimentLabel { get; set; } = string.Empty;
     }

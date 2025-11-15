@@ -26,13 +26,11 @@ namespace Fall2025_Project3_nchubbell.Controllers
             _aiReviewService = aiReviewService;
         }
 
-        // GET: Actors
         public async Task<IActionResult> Index()
         {
             return View(await _context.Actors.ToListAsync());
         }
 
-        // GET: Actors/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -50,16 +48,13 @@ namespace Fall2025_Project3_nchubbell.Controllers
                 return NotFound();
             }
 
-            // 1. Get AI-generated tweets as one big string
             var aiTweetsRaw = await _aiReviewService.GenerateActorTweetsAsync(
                 actor.Name,
                 tweetCount: 20);
 
-            // 2. Split into individual tweets/comments (blank line separation)
             var aiTweets = aiTweetsRaw
                 .Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            // 3. Analyze sentiment with VADER
             var analyzer = new SentimentIntensityAnalyzer();
             var tweetViewModels = new List<ReviewWithSentiment>();
 
@@ -92,7 +87,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
                 });
             }
 
-            // 4. Compute overall sentiment
             double overallCompound = tweetViewModels.Any()
                 ? tweetViewModels.Average(t => t.Compound)
                 : 0.0;
@@ -111,7 +105,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
                 overallLabel = "Overall Neutral";
             }
 
-            // 5. Build the view model
             var viewModel = new ActorDetailsViewModel
             {
                 Id = actor.Id,
@@ -132,13 +125,11 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(viewModel);
         }
 
-        // GET: Actors/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Actors/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Actor actor, IFormFile photoFile)
@@ -160,7 +151,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actor);
         }
 
-        // GET: Actors/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -176,7 +166,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actor);
         }
 
-        // POST: Actors/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Gender,Age,ImdbUrl,Photo")] Actor actor)
@@ -209,7 +198,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actor);
         }
 
-        // GET: Actors/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -227,7 +215,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actor);
         }
 
-        // POST: Actors/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

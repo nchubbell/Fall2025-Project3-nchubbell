@@ -19,7 +19,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             _context = context;
         }
 
-        // GET: ActorMovies
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.ActorMovies
@@ -29,7 +28,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: ActorMovies/Details?actorId=1&movieId=2
         public async Task<IActionResult> Details(int? actorId, int? movieId)
         {
             if (actorId == null || movieId == null)
@@ -52,7 +50,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actorMovie);
         }
 
-        // GET: ActorMovies/Create
         public IActionResult Create()
         {
             ViewData["ActorId"] = new SelectList(_context.Actors, "ActorId", "Name");
@@ -60,7 +57,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View();
         }
 
-        // POST: ActorMovies/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ActorId,MovieId")] ActorMovie actorMovie)
@@ -76,7 +72,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actorMovie);
         }
 
-        // GET: ActorMovies/Edit?actorId=1&movieId=2
         public async Task<IActionResult> Edit(int? actorId, int? movieId)
         {
             if (actorId == null || movieId == null)
@@ -99,12 +94,10 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actorMovie);
         }
 
-        // POST: ActorMovies/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int actorId, int movieId, [Bind("ActorId,MovieId")] ActorMovie actorMovie)
         {
-            // Ensure route params and model match
             if (actorId != actorMovie.ActorId || movieId != actorMovie.MovieId)
             {
                 return NotFound();
@@ -135,7 +128,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actorMovie);
         }
 
-        // GET: ActorMovies/Delete?actorId=1&movieId=2
         public async Task<IActionResult> Delete(int? actorId, int? movieId)
         {
             if (actorId == null || movieId == null)
@@ -158,7 +150,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(actorMovie);
         }
 
-        // POST: ActorMovies/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int actorId, int movieId)

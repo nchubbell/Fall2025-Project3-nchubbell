@@ -48,17 +48,14 @@ namespace Fall2025_Project3_nchubbell.Controllers
                 return NotFound();
             }
 
-            // 1. Get AI-generated reviews as one big string
             var aiReviewsRaw = await _aiReviewService.GenerateMovieReviewsAsync(
                 movie.Title,
-                null,           // or movie.Description if you add it
+                null,          
                 reviewCount: 10);
 
-            // 2. Split into individual reviews (assuming blank line separators)
             var aiReviews = aiReviewsRaw
                 .Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            // 3. Run VADER sentiment on each review
             var analyzer = new SentimentIntensityAnalyzer();
             var reviewViewModels = new List<ReviewWithSentiment>();
 
@@ -91,7 +88,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
                 });
             }
 
-            // 4. Compute overall/average sentiment
             double overallCompound = reviewViewModels.Any()
                 ? reviewViewModels.Average(r => r.Compound)
                 : 0.0;
@@ -110,7 +106,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
                 overallLabel = "Overall Neutral";
             }
 
-            // 5. Build the view model
             var viewModel = new MovieDetailsViewModel
             {
                 Id = movie.Id,
@@ -131,15 +126,11 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(viewModel);
         }
 
-        // --- Scaffolded CRUD actions below ---
-
-        // GET: Movies/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Movies/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Genre,Year,ImdbUrl,Poster")] Movie movie)
@@ -153,7 +144,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(movie);
         }
 
-        // GET: Movies/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -169,7 +159,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(movie);
         }
 
-        // POST: Movies/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Genre,Year,ImdbUrl,Poster")] Movie movie)
@@ -202,7 +191,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(movie);
         }
 
-        // GET: Movies/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -220,7 +208,6 @@ namespace Fall2025_Project3_nchubbell.Controllers
             return View(movie);
         }
 
-        // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
