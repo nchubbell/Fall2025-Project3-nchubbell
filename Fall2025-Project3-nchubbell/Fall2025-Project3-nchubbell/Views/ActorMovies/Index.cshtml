@@ -1,39 +1,73 @@
 ﻿@model IEnumerable<Fall2025_Project3_nchubbell.Models.ActorMovie>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Actor–Movie Links";
 }
 
-<h1>Index</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0" style="color:#9E1B32;">Actor–Movie Links</h1>
+        <a asp-action="Create"
+           class="btn btn-sm"
+           style="background-color:#9E1B32; color:#f8f9fa;">
+            Create New
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Actor</th>
-            <th>Movie</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Actor.Name)
-                </td>
-                <td>
-                    @* Use Title instead of Genre; change back if you prefer Genre *@
-                    @Html.DisplayFor(modelItem => item.Movie.Title)
-                </td>
-                <td>
-                    @Html.ActionLink("Details", "Details", new { actorId = item.ActorId, movieId = item.MovieId }) |
-                    @Html.ActionLink("Edit", "Edit", new { actorId = item.ActorId, movieId = item.MovieId }) |
-                    @Html.ActionLink("Delete", "Delete", new { actorId = item.ActorId, movieId = item.MovieId })
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-striped table-hover align-middle" id="actorMoviesTable">
+                <thead>
+                    <tr>
+                        <th>Actor</th>
+                        <th>Movie</th>
+                        <th style="width: 180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Actors"
+                                   asp-action="Details"
+                                   asp-route-id="@item.ActorId"
+                                   class="link-underline">
+                                    @item.Actor?.Name
+                                </a>
+                            </td>
+                            <td>
+                                <a asp-controller="Movies"
+                                   asp-action="Details"
+                                   asp-route-id="@item.MovieId"
+                                   class="link-underline">
+                                    @item.Movie?.Title
+                                </a>
+                            </td>
+                            <td>
+                                @Html.ActionLink(
+                                "Details",
+                                                        "Details",
+                                                        new { actorId = item.ActorId, movieId = item.MovieId },
+                                                        new { @class = "btn btn-sm btn-outline-primary me-1" }
+                                                        )
+                            @Html.ActionLink(
+                                                        "Edit",
+                                                        "Edit",
+                                                        new { actorId = item.ActorId, movieId = item.MovieId },
+                                                        new { @class = "btn btn-sm btn-outline-secondary me-1" }
+                                                        )
+                            @Html.ActionLink(
+                                                        "Delete",
+                                                        "Delete",
+                                                        new { actorId = item.ActorId, movieId = item.MovieId },
+                                                        new { @class = "btn btn-sm btn-outline-danger" }
+                                                        )
+                        </td>
+                    </tr>
+                                        }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

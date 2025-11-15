@@ -1,49 +1,71 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
+using Azure.AI.OpenAI;
+using Microsoft.Extensions.Configuration;
+using OpenAI.Chat;
+using System.ClientModel;
 
 namespace Fall2025_Project3_nchubbell.Services
 {
-    // NOTE: This implementation does NOT call Azure OpenAI.
-    // It just returns placeholder text that looks like AI output,
-    // while still matching the IAIReviewService interface.
     public class AzureAIReviewService : IAIReviewService
     {
-        public AzureAIReviewService()
+        private readonly ChatClient _chatClient;
+
+        public AzureAIReviewService(IConfiguration configuration)
         {
+            string endpoint = configuration["AzureOpenAI:Endpoint"]
+                ?? throw new InvalidOperationException("AzureOpenAI:Endpoint not configured.");
+            string apiKey = configuration["AzureOpenAI:ApiKey"]
+                ?? throw new InvalidOperationException("AzureOpenAI:ApiKey not configured.");
+            string deploymentName = configuration["AzureOpenAI:DeploymentName"]
+                ?? throw new InvalidOperationException("AzureOpenAI:DeploymentName not configured.");
+
+            // Azure.AI.OpenAI 2.x style
+            var azureClient = new AzureOpenAIClient(
+                new Uri(endpoint),
+                new ApiKeyCredential(apiKey));
+
+            _chatClient = azureClient.GetChatClient(deploymentName);
         }
 
-        public Task<string> GenerateMovieReviewsAsync(string title, string? description, int reviewCount)
+        // Generate N reviews for a movie (we'll call it with N = 3)
+        public async Task<string> GenerateMovieReviewsAsync(string title, string? description, int reviewCount)
         {
-            var sb = new StringBuilder();
+            var systemMessage = new SystemChatMessage(
+                "You are a helpful movie critic who writes short, distinct reviews.");
 
-            for (int i = 1; i <= reviewCount; i++)
+            var userPrompt = new StringBuilder();
+            userPrompt.AppendLine($"Write {reviewCount} short, distinct reviews for the movie \"{title}\".");
+            if (!string.IsNullOrWhiteSpace(description))
             {
-                sb.AppendLine($"Review {i} for \"{title}\":");
-                sb.AppendLine("This is a sample review generated locally instead of using Azure OpenAI.");
-                if (!string.IsNullOrWhiteSpace(description))
-                {
-                    sb.AppendLine($"Plot hint: {description}");
-                }
-                sb.AppendLine("Overall, this movie is entertaining and worth watching.");
-                sb.AppendLine(); // blank line between reviews
+                userPrompt.AppendLine($"Here is the plot/description: {description}");
             }
+            userPrompt.AppendLine("Return ONLY the reviews as plain text, with a blank line between each review.");
 
-            return Task.FromResult(sb.ToString());
+            var userMessage = new UserChatMessage(userPrompt.ToString());
+
+            ChatCompletion completion = await _chatClient.CompleteChatAsync(
+                new ChatMessage[] { systemMessage, userMessage });
+
+            // All reviews in one big string; controllers will split on blank lines
+            return completion.Content[0].Text;
         }
 
-        public Task<string> GenerateActorTweetsAsync(string actorName, int tweetCount)
+        // Generate N tweets/comments for an actor (we'll call it with N = 5)
+        public async Task<string> GenerateActorTweetsAsync(string actorName, int tweetCount)
         {
-            var sb = new StringBuilder();
+            var systemMessage = new SystemChatMessage(
+                "You write short, positive social-media style comments about actors.");
 
-            for (int i = 1; i <= tweetCount; i++)
-            {
-                sb.AppendLine($"Comment {i} about {actorName}:");
-                sb.AppendLine($"{actorName} absolutely stole the show in their latest role!");
-                sb.AppendLine("Such a fun performance – can’t wait to see what they do next.");
-                sb.AppendLine(); // blank line between comments
-            }
+            var userMessage = new UserChatMessage(
+                $"Write {tweetCount} short, enthusiastic social-media style comments about the actor \"{actorName}\". " +
+                "Each comment should be its own paragraph. Return ONLY the comments separated by blank lines.");
 
-            return Task.FromResult(sb.ToString());
+            ChatCompletion completion = await _chatClient.CompleteChatAsync(
+                new ChatMessage[] { systemMessage, userMessage });
+
+            return completion.Content[0].Text;
         }
     }
 }

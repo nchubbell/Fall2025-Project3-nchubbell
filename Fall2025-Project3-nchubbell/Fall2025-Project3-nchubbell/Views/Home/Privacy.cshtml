@@ -1,6 +1,52 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card shadow-lg border-0" style="border-radius:1.25rem; overflow:hidden;">
+                <div class="card-header" style="background-color:#9E1B32; color:#f8f9fa;">
+                    <h1 class="h5 mb-0">@ViewData["Title"]</h1>
+                </div>
+
+                <div class="card-body">
+                    <p>
+                        This site is a course project for managing movies and actors with
+                        AI-generated content. It is not intended for production use.
+                    </p>
+
+                    <h2 class="h6 mt-3" style="color:#9E1B32;">Data You Enter</h2>
+                    <p>
+                        The application stores the information you enter about movies and actors,
+                        including titles, genres, years, names, ages, and links such as IMDb URLs.
+                        Uploaded files (like posters and photos) are stored in the project database.
+                    </p>
+
+                    <h2 class="h6 mt-3" style="color:#9E1B32;">AI-Generated Content</h2>
+                    <p>
+                        Movie reviews and actor tweets are generated using Azure OpenAI services.
+                        These generated texts are stored in the database along with sentiment
+                        scores computed by Vader sentiment analysis.
+                    </p>
+
+                    <h2 class="h6 mt-3" style="color:#9E1B32;">Authentication &amp; Accounts</h2>
+                    <p>
+                        This project uses ASP.NET Core Identity for individual user accounts.
+                        Login information is handled by the framework and is used only to
+                        demonstrate authentication functionality for the assignment.
+                    </p>
+
+                    <h2 class="h6 mt-3" style="color:#9E1B32;">Educational Use</h2>
+                    <p>
+                        All data and features in this site are for demonstration and grading
+                        purposes only. Do not enter sensitive personal information. By using
+                        this site, you acknowledge that it is a student project.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

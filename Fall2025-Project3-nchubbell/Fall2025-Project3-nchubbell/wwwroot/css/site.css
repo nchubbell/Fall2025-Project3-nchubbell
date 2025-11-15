@@ -1,22 +1,70 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
 
 body {
-  margin-bottom: 60px;
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.navbar-bama {
+    background-color: #9E1B32; 
+    border-bottom: 2px solid #F2A900;
+}
+
+    .navbar-bama .navbar-brand,
+    .navbar-bama .nav-link,
+    .navbar-bama .navbar-text {
+        color: #f9fafb !important;
+    }
+
+        .navbar-bama .nav-link:hover,
+        .navbar-bama .nav-link:focus {
+            color: #F2A900 !important;
+        }
+
+        .navbar-bama .nav-link.active {
+            font-weight: 600;
+            border-bottom: 2px solid #F2A900;
+        }
+
+.footer-bama {
+    background-color: #1f2933;
+    color: #e5e7eb;
+}
+
+    .footer-bama a {
+        color: #F2A900;
+        text-decoration: none;
+    }
+
+        .footer-bama a:hover {
+            text-decoration: underline;
+        }
+
+.card {
+    border-radius: 1.1rem;
+}
+
+.table thead {
+    background-color: #9E1B32;
+    color: #f9fafb;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+
+.link-underline {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 999px;
+    padding: 0.15rem 0.75rem;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border-radius: 999px;
+    padding: 0.15rem 0.75rem;
 }

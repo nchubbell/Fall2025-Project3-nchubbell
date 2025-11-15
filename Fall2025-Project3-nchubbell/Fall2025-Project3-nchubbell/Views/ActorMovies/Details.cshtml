@@ -1,42 +1,82 @@
 ﻿@model Fall2025_Project3_nchubbell.Models.ActorMovie
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Actor–Movie Link Details";
 }
 
-<h1>Details</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-<div>
-    <h4>ActorMovie</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Actor)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Actor.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie)
-        </dt>
-        <dd class="col-sm-10">
-            @* You can switch back to Genre if you prefer *@
-            @Html.DisplayFor(model => model.Movie.Title)
-        </dd>
-    </dl>
-</div>
-<div>
-    @Html.ActionLink(
-    "Edit",
-        "Edit",
-        new { actorId = Model.ActorId, movieId = Model.MovieId }
-        )
-    |
-    @Html.ActionLink(
-        "Delete",
-        "Delete",
-        new { actorId = Model.ActorId, movieId = Model.MovieId }
-        )
-    |
-    <a asp-action="Index">Back to List</a>
+            <div class="card shadow-lg border-0" style="border-radius:1.25rem; overflow:hidden;">
+                <div class="card-header" style="background-color:#9E1B32; color:#f8f9fa;">
+                    <h1 class="h5 mb-0">Actor–Movie Link</h1>
+                </div>
+
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3 text-muted">
+                            Actor
+                        </dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Actor != null)
+                            {
+                                <a asp-controller="Actors"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.ActorId"
+                                   class="link-underline">
+                                    @Model.Actor.Name
+                                </a>
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(m => m.Actor.Name)
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3 text-muted">
+                            Movie
+                        </dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Movie != null)
+                            {
+                                <a asp-controller="Movies"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.MovieId"
+                                   class="link-underline">
+                                    @Model.Movie.Title
+                                </a>
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(m => m.Movie.Title)
+                            }
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between"
+                     style="background-color:#f9fafb;">
+                    <div>
+                        @Html.ActionLink(
+                        "Edit",
+                                                "Edit",
+                                                new { actorId = Model.ActorId, movieId = Model.MovieId },
+                                                new { @class = "btn btn-sm btn-outline-secondary me-2" }
+                                                )
+                        @Html.ActionLink(
+                                                "Delete",
+                                                "Delete",
+                                                new { actorId = Model.ActorId, movieId = Model.MovieId },
+                                                new { @class = "btn btn-sm btn-outline-danger" }
+                                                )
+                    </div>
+                    <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                        Back to List
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>

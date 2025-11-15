@@ -1,59 +1,90 @@
 ﻿@model IEnumerable<Fall2025_Project3_nchubbell.Models.Actor>
+@using System
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Actors";
 }
 
-<h1>Index</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="mb-0" style="color:#9E1B32;">Actors</h1>
+        <a asp-action="Create"
+           class="btn btn-sm"
+           style="background-color:#9E1B32; color:#f8f9fa;">
+            Create New
+        </a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Gender)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Age)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImdbUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Photo)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Gender)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Age)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImdbUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Photo)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <table class="table table-striped table-hover align-middle" id="actorsTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>Age</th>
+                        <th>IMDb</th>
+                        <th>Photo</th>
+                        <th style="width: 140px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Gender</td>
+                            <td>@item.Age</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImdbUrl))
+                                {
+                                    <a href="@item.ImdbUrl"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="link-underline">
+                                        IMDb
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Photo != null)
+                                {
+                                    var base64 = Convert.ToBase64String(item.Photo);
+                                    var imgSrc = $"data:image/png;base64,{base64}";
+                                    <img src="@imgSrc"
+                                         alt="Photo of @item.Name"
+                                         style="height:60px; width:auto;"
+                                         class="rounded shadow-sm" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">No photo</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a asp-action="Edit" asp-route-id="@item.Id"
+                                       class="btn btn-outline-secondary">
+                                        Edit
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id"
+                                       class="btn btn-outline-primary">
+                                        Details
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id"
+                                       class="btn btn-outline-danger">
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
